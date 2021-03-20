@@ -1,0 +1,10 @@
+@import "./normalize.css";
+@import "./variables.css";
+@import "./generales.css";
+@import "./header.css";
+@import "./menu.css";
+@import "./peliculas.css";
+@import "./busqueda.css";
+@import "./modal.css";
+@import "./animaciones.css";
+@import "./mobile.css";
