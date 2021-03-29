@@ -1,93 +1,91 @@
-/* ------------------ */
 /* VARIABLES GLOBALES */
-/* ------------------ */
 
 // Servicios Externos
-const API_USUARIOS = `https://randomuser.me/api/?inc=name,picture&results=`;
-const API_PELICULAS = "https://yts.mx/api/v2/list_movies.json";
+const ApiUsers = `https://randomuser.me/api/?inc=name,picture&results=`;
+const ApiMovies = "https://yts.mx/api/v2/list_movies.json";
 
 // Contenedores
 const $navbar = document.getElementById('header');
-const $listaAmigos = document.getElementById('lista-amigos');
-const $listaPeliculasRecientes = document.getElementById('lista-peliculas-recientes');
-const $peliculasAccion = document.getElementById('peliculas-accion');
-const $peliculasDrama = document.getElementById('peliculas-drama');
-const $peliculasAnimation = document.getElementById('peliculas-animacion');
-const $seccionBusqueda = document.getElementById('seccion-busqueda');
+const $listFriends = document.getElementById('lista-amigos');
+const $listMoviesReci = document.getElementById('lista-peliculas-recientes');
+const $MoviesAction = document.getElementById('peliculas-accion');
+const $moviesDrama = document.getElementById('peliculas-drama');
+const $moviesAnimations = document.getElementById('peliculas-animacion');
+const $sectionSearch = document.getElementById('seccion-busqueda');
 const $modal = document.getElementById('modal');
 
-/* ------------------------------------------------------------------------- */
+
 /* TRABAJAMOS CON EL FORMULARIO DE BUSQUEDA, EL API Y LA SECCION DE BUSQUEDA */
-/* ------------------------------------------------------------------------- */
 
-const $formularioBusqueda = document.getElementById('formulario');
 
-$formularioBusqueda.addEventListener("submit", async (event) => {
+const $formSearch = document.getElementById('formulario');
+
+$formSearch.addEventListener("submit", async (event) => {
     // Evita el recargo de la pagina
     event.preventDefault()
 
     // Oculta el teclado cuando estamos en dispositivos moviles
-    const inputOculto = document.createElement('input');
-    inputOculto.setAttribute('type', 'text');
-    document.body.appendChild(inputOculto);
+    const inputocult = document.createElement('input');
+    inputocult.setAttribute('type', 'text');
+    document.body.appendChild(inputocult);
 
-    inputOculto.focus();
-    setTimeout(() => inputOculto.remove(), 1)
+    inputocult.focus();
+    setTimeout(() => inputocult.remove(), 1)
 
     // Obtiene el valor del input e intenta la busqueda mediante el API
-    const formData = new FormData($formularioBusqueda);
-    const inputBusqueda = formData.get("pelicula");
+    const formData = new FormData($formSearch);
+    const inputSearch = formData.get("pelicula");
 
     try {
-        if($seccionBusqueda.children[0]) $seccionBusqueda.children[0].remove()
-        $formularioBusqueda.appendChild(crear_elementoHTML("", $formularioBusqueda))
+        if($sectionSearch.children[0]) $sectionSearch.children[0].remove()
+        $formSearch.appendChild(createHtmlElement("", $formSearch))
 
-        const pelicula = await cargar_peliculas(`?query_term=${inputBusqueda}&limit=1`)
-        agregar_datos_a_HTML(pelicula, $seccionBusqueda)
-        $formularioBusqueda.children[1].remove()
+        const pelicula = await loadMovies(`?query_term=${inputSearch}&limit=1`)
+        addDataHtml(pelicula, $sectionSearch)
+        $formSearch.children[1].remove()
     } catch (error) {
         console.log(error)
-        $formularioBusqueda.children[1].remove()
+        $formSearch.children[1].remove()
     }
 });
 
-/* --------------------------------------------------------------------------------------- */
+
 /* TRABAJAMOS CON PETICIONES AL API Y CON LOS RESULTADOS CREAMOS DIFERENTES ELEMENTOS HTML */
-/* --------------------------------------------------------------------------------------- */
 
-(async function cargar_datos() {
+
+(async function loadData() {
     try {
-        const usuario = await cargar_usuarios(1, "usuario")
-        agregar_datos_a_HTML(usuario, $navbar)
+        const usuario = await loadUsers(1, "usuario")
+        addDataHtml(usuario, $navbar)
 
-        const amigos = await cargar_usuarios(8, "amigos")
-        agregar_datos_a_HTML(amigos, $listaAmigos)
+        const amigos = await loadUsers(8, "amigos")
+        addDataHtml(amigos, $listFriends)
     } catch (error) {     
         console.log(error)
     }
 
     try {
-        const peliculasRecientes = await cargar_peliculas("?query_term=2019&limit=9", 'recientes')
-        agregar_datos_a_HTML(peliculasRecientes, $listaPeliculasRecientes)
+        const moviesRecien = await loadMovies("?query_term=2019&limit=9", 'recientes')
+        addDataHtml(moviesRecien, $listMoviesReci)
         
-        const peliculasAccion = await cargar_peliculas("?genre=action", 'accion')
-        agregar_datos_a_HTML(peliculasAccion, $peliculasAccion)
-        $peliculasAccion.children[0].remove()
+        const peliculasAccion = await loadMovies("?genre=action", 'accion')
+        addDataHtml(peliculasAccion, $MoviesAction)
+        $MoviesAction.children[0].remove()
         
-        const peliculasDrama = await cargar_peliculas("?genre=drama", 'drama')
-        agregar_datos_a_HTML(peliculasDrama, $peliculasDrama)
-        $peliculasDrama.children[0].remove()
+        const moviesDrama = await loadMovies("?genre=drama", 'drama')
+        addDataHtml(moviesDrama, $moviesDrama)
+        $moviesDrama.children[0].remove()
 
-        const peliculasAnimation = await cargar_peliculas("?genre=animation", 'animacion')
-        agregar_datos_a_HTML(peliculasAnimation, $peliculasAnimation)
-        $peliculasAnimation.children[0].remove()
+        const moviesAnimations = await loadMovies("?genre=animation", 'animacion')
+        addDataHtml(moviesAnimations, $moviesAnimations)
+        $moviesAnimations.children[0].remove()
     } catch (error) {
         console.log(error)
     }
 })();
 
-function cargar_usuarios(cantidad, identificador) {
-    let url = API_USUARIOS + cantidad
+function loadUsers(cantidad, identificador) {
+    let url = ApiUsers + cantidad
     if (sessionStorage.getItem(identificador)) return JSON.parse(window.sessionStorage.getItem(identificador));
 
     return new Promise((resolve, reject) => {
@@ -105,8 +103,8 @@ function cargar_usuarios(cantidad, identificador) {
     }) 
 }
 
-function cargar_peliculas(urlOptions, identificador) {
-    let url = API_PELICULAS + urlOptions;
+function loadMovies(urlOptions, identificador) {
+    let url = ApiMovies + urlOptions;
     if (sessionStorage.getItem(identificador)) return JSON.parse(window.sessionStorage.getItem(identificador));
 
     return new Promise((resolve, reject) => {
@@ -124,74 +122,74 @@ function cargar_peliculas(urlOptions, identificador) {
     }) 
 }
 
-function agregar_datos_a_HTML(datos, $contenedor) {
+function addDataHtml(datos, $contenedor) {
     datos.map(data => {
-        let $elemento = crear_elementoHTML(data, $contenedor);
-        $contenedor.appendChild($elemento)
+        let $element = createHtmlElement(data, $contenedor);
+        $contenedor.appendChild($element)
 
-        if ($contenedor != $navbar && $contenedor != $listaAmigos) {
-            $elemento.addEventListener("click", () => abrirModal(data))
+        if ($contenedor != $navbar && $contenedor != $listFriends) {
+            $element.addEventListener("click", () => openModal(data))
         } 
     })
 }
 
-function crear_elementoHTML(data, $contenedor) {
+function createHtmlElement(data, $contenedor) {
     switch ($contenedor) {
         case $navbar:
-            var $elemento = document.createElement('p')
-            $elemento.classList.add("header-usuario")
-            $elemento.innerHTML = 
+            var $element = document.createElement('p')
+            $element.classList.add("header-usuario")
+            $element.innerHTML = 
             `<img src="${data.picture.medium}"><span>${data.name.first} ${data.name.last}</span>`
-        return $elemento;
+        return $element;
 
-        case $listaAmigos:
-            var $elemento = document.createElement('li')
-            $elemento.innerHTML = 
+        case $listFriends:
+            var $element = document.createElement('li')
+            $element.innerHTML = 
             `<a class="menu-link">
                 <img src="${data.picture.medium}"><span>${data.name.first} ${data.name.last}</span>
             </a>`
-        return $elemento;
+        return $element;
 
-        case $listaPeliculasRecientes:
-            var $elemento = document.createElement('li')
-            $elemento.innerHTML = 
+        case $listMoviesReci:
+            var $element = document.createElement('li')
+            $element.innerHTML = 
             `<a class="menu-link">
                 ${data.title_long}
             </a>`
-        return $elemento;
+        return $element;
 
-        case $peliculasAccion:
-        case $peliculasDrama:
-        case $peliculasAnimation:
-            var $elemento = document.createElement('figure')
-            $elemento.classList.add('pelicula')
-            $elemento.innerHTML = 
+        case $MoviesAction:
+        case $moviesDrama:
+        case $moviesAnimations:
+            var $element = document.createElement('figure')
+            $element.classList.add('pelicula')
+            $element.innerHTML = 
             `<img src="${data.medium_cover_image}">
             <figcaption>${data.title}</figcaption>`
-        return $elemento;
+        return $element;
 
-        case $formularioBusqueda:
-            var $elemento = document.createElement('img')
-            $elemento.setAttribute("src", "./images/loader.gif");
-            $elemento.classList.add("imagen-loading")
+        case $formSearch:
+            var $element = document.createElement('img')
+            $element.setAttribute("src", "./images/loader.gif");
+            $element.classList.add("imagen-loading")
 
-        return $elemento;
+        return $element;
 
-        case $seccionBusqueda:
-            var $elemento = document.createElement('figure')
-            $elemento.classList.add('busqueda-pelicula')
-            $elemento.innerHTML = 
+        case $sectionSearch:
+            var $element = document.createElement('figure')
+            $element.classList.add('busqueda-pelicula')
+            $element.innerHTML = 
             `<img src="${data.medium_cover_image}">
             <div>
                 <p>Pelicula Encontrada</p>
                 <h3>${data.title}</h3>
             </div>`
-        return $elemento;
+        return $element;
 
         case $modal:
-            var $elemento = document.createElement('div')
-            $elemento.setAttribute("id", "modal-container");
-            $elemento.innerHTML = 
+            var $element = document.createElement('div')
+            $element.setAttribute("id", "modal-container");
+            $element.innerHTML = 
             `<h2 class="modal-titulo">${data.title_long}</h2>
             <div class="modal-contenido">
                 <img src="${data.medium_cover_image}">
@@ -199,28 +197,28 @@ function crear_elementoHTML(data, $contenedor) {
             </div>
             <button class="modal-button" id="btn-cerrar-modal">Cerrar</button>`
 
-        return $elemento
+        return $element
     }
 }
 
-/* -------------------------------------------------------------- */
-/* TRABAJAMOS CON UN MODAL PARA MOSTRAR LOS DATOS DE UNA PELICULA */
-/* -------------------------------------------------------------- */
 
-function abrirModal(data) {
+/* TRABAJAMOS CON UN MODAL PARA MOSTRAR LOS DATOS DE UNA PELICULA */
+
+
+function openModal(data) {
     $modal.classList.add('activo')
     $modal.classList.remove('inactivo')
-    $modal.appendChild(crear_elementoHTML(data, $modal))
+    $modal.appendChild(createHtmlElement(data, $modal))
 
     const $modalContainer = document.getElementById('modal-container');
     const $btnCerrarModal = document.getElementById('btn-cerrar-modal');
 
-    $modal.addEventListener('click', animacionCierreModal);
-    $btnCerrarModal.addEventListener('click', animacionCierreModal);
+    $modal.addEventListener('click', aniamtionCloseModal);
+    $btnCerrarModal.addEventListener('click', aniamtionCloseModal);
     $modalContainer.addEventListener('click', event => event.stopPropagation());
 }
 
-function animacionCierreModal() {
+function aniamtionCloseModal() {
     $modal.classList.add('inactivo')
     $modal.addEventListener('animationend', cerrarModal)
 }
@@ -231,9 +229,9 @@ function cerrarModal(event) {
     $modal.children[0].remove()
 }
 
-/* ---------------------------------------------------------------------------------------------------- */
+
 /* TRABAJAMOS CON EL BOTON MENU DEL HEADER PARA MOSTRAR LA SECCION MENU EN RESOLUCIONES MENORES A 800px */
-/* ---------------------------------------------------------------------------------------------------- */
+
 
 (function menuResponsive() {
     const $seccionMenu = document.getElementById('seccion-menu')
@@ -244,9 +242,7 @@ function cerrarModal(event) {
     $capaMenu.addEventListener('click', () => $seccionMenu.classList.remove('activo'))
 })();
 
-/* ---------------------------------------------------------------------------------------- */
 /* TRABAJAMOS CON EL BODY Y OBTENEMOS SU VH REAL DEBIDO A PROBLEMAS CON NAVEGADORES MOVILES */
-/* ---------------------------------------------------------------------------------------- */
 
 function calcularViewportHeight() {
     const viewportHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
